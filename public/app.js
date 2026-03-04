@@ -2,7 +2,7 @@
 API BASE
 ------------------------------*/
 
-const API = "http://localhost:3000";
+const API = "";
 
 /* -----------------------------
 GLOBAL STATE
