@@ -1,13 +1,20 @@
 {
   "name": "attendance-system",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Full-stack attendance tracking system using Node.js, Express and SQLite",
+  "main": "server/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/server.js",
+    "test": "echo \"No tests specified\""
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "attendance",
+    "nodejs",
+    "express",
+    "sqlite",
+    "tracker"
+  ],
+  "author": "Sujit Pal",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
