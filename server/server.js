@@ -7,7 +7,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
+const path = require("path");
+app.use(express.static(path.join(__dirname, "../public")));
 
 /* -------------------------
 GET ALL STUDENTS
@@ -201,7 +202,11 @@ app.get("/overall/:student", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/../public/index.html");
+  res.sendFile(path.join(__dirname, "../public/index.html"));
+});
+
+app.get("/health", (req, res) => {
+  res.send("OK");
 });
 
 const PORT = process.env.PORT || 3000;
