@@ -37,7 +37,7 @@ statistics based on **subject weights**.
 
 ---
 
-## 📂 Project Structure
+<!-- ## 📂 Project Structure
 
     attendance-tracker
     │
@@ -53,7 +53,7 @@ statistics based on **subject weights**.
         ├ app.js             # Client-side logic
         └ style.css          # Styling
 
----
+--- -->
 
 ## ⚙️ Installation
 
@@ -78,7 +78,7 @@ Run the server:
 
 ---
 
-## 📊 How Attendance is Calculated
+<!-- ## 📊 How Attendance is Calculated
 
 Each subject has a **weight value**.
 
@@ -131,7 +131,7 @@ Cancelled classes are **excluded** from the total.
 -   Mobile responsive UI
 -   Export attendance reports -->
 
----
+--- -->
 
 ## 👨‍💻 Author
 
