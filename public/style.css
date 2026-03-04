@@ -217,56 +217,73 @@ grid-template-columns: 1fr;
 /* MOBILE RESPONSIVE */
 /* ========================= */
 
+
 @media (max-width: 600px) {
 
-.header{
-font-size:18px;
-}
+    /* High-Visibility Buttons */
+    button, 
+    .add-student button, 
+    .routine-table button {
+        width: 100%;
+        min-height: 56px;      /* Standard Android 'Large' FAB/Button height */
+        font-size: 18px;       /* Bigger text for readability */
+        font-weight: 600;      /* Medium-Bold for better contrast */
+        margin: 8px 0;         /* More vertical spacing between buttons */
+        padding: 14px;
+        border-radius: 12px;   /* Softer, more modern rounded corners */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0.5px; /* Cleaner text appearance */
+    }
 
-.main-container{
-padding:10px;
-gap:15px;
-}
+    /* Input Fields to match the massive button size */
+    .add-student input,
+    .student-select select,
+    .date-selector input {
+        width: 100%;
+        min-height: 56px;
+        font-size: 18px;
+        padding: 0 15px;
+        margin-bottom: 12px;
+        border: 2px solid #dcdde1; /* Thicker border for better visibility */
+    }
 
-.left-panel,
-.center-panel,
-.right-panel{
-padding:15px;
-}
+    /* Specific adjustment for the Daily Routine buttons in table */
+    /* We stack them so they don't look cramped side-by-side */
+    .routine-table td {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 15px 10px;
+    }
 
-.attendance-circle{
-width:120px;
-height:120px;
-font-size:24px;
-}
+    /* Attendance Circle: Bigger for high-density mobile screens */
+    .attendance-circle {
+        width: 170px;
+        height: 170px;
+        font-size: 34px;
+        margin: 20px auto;
+        border-width: 12px;
+    }
 
-button{
-font-size:12px;
-padding:6px 8px;
-}
+    /* Overall Text sizes */
+    .header {
+        font-size: 24px;
+        padding: 25px 15px;
+    }
 
-/* student input stack */
+    h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
 
-.add-student{
-flex-direction:column;
-}
-
-.add-student input,
-.add-student button{
-width:100%;
-}
-
-/* date selector stack */
-
-.routine-header{
-flex-direction:column;
-align-items:flex-start;
-}
-
-.date-selector{
-display:flex;
-gap:5px;
-flex-wrap:wrap;
-}
-
+    /* Table text scaling */
+    .routine-table th, 
+    .summary-table th,
+    .summary-table td {
+        font-size: 17px;
+        padding: 15px 8px;
+    }
 }
