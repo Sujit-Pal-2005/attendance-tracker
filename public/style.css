@@ -1,0 +1,208 @@
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+background: #f5f6fa;
+color: #2f3640;
+}
+
+/* HEADER */
+
+.header {
+background: #273c75;
+color: white;
+padding: 15px;
+text-align: center;
+}
+
+/* MAIN GRID */
+
+.main-container {
+display: grid;
+grid-template-columns: 1fr 2fr 1fr;
+gap: 20px;
+padding: 20px;
+}
+
+/* PANELS */
+
+.left-panel,
+.center-panel,
+.right-panel {
+background: white;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* ATTENDANCE CIRCLE */
+
+.attendance-circle {
+width: 160px;
+height: 160px;
+border-radius: 50%;
+margin: 20px auto;
+
+display: flex;
+align-items: center;
+justify-content: center;
+
+font-size: 32px;
+font-weight: bold;
+color: #273c75;
+
+background: conic-gradient(
+#44bd32 0%,
+#44bd32 82%,
+#dcdde1 82%,
+#dcdde1 100%
+);
+}
+
+.weight-info {
+text-align: center;
+margin-top: 10px;
+}
+
+.weight-info p {
+margin-top: 5px;
+}
+
+/* ROUTINE HEADER */
+
+.routine-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 15px;
+}
+
+.date-selector input {
+padding: 6px;
+border-radius: 5px;
+border: 1px solid #ccc;
+}
+
+/* ROUTINE TABLE */
+
+.routine-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.routine-table th,
+.routine-table td {
+padding: 10px;
+text-align: center;
+border-bottom: 1px solid #eee;
+}
+
+.routine-table th {
+background: #f1f2f6;
+}
+
+/* STATUS BUTTONS */
+
+button {
+padding: 6px 10px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+margin: 2px;
+font-size: 13px;
+}
+
+.attended {
+background: #44bd32;
+color: white;
+}
+
+.missed {
+background: #e84118;
+color: white;
+}
+
+.cancelled {
+background: #7f8fa6;
+color: white;
+}
+
+/* STUDENT PANEL */
+
+.add-student {
+display: flex;
+gap: 8px;
+margin-bottom: 15px;
+}
+
+.add-student input {
+flex: 1;
+padding: 7px;
+border: 1px solid #ccc;
+border-radius: 5px;
+}
+
+.add-student button {
+background: #273c75;
+color: white;
+}
+
+.student-select select {
+width: 100%;
+padding: 7px;
+border-radius: 5px;
+border: 1px solid #ccc;
+}
+
+/* SUMMARY SECTION */
+
+.summary-section {
+margin: 20px;
+background: white;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.summary-table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 10px;
+}
+
+.summary-table th,
+.summary-table td {
+padding: 10px;
+border-bottom: 1px solid #eee;
+text-align: center;
+}
+
+.summary-table th {
+background: #f1f2f6;
+}
+
+/* HOVER EFFECT */
+
+button:hover {
+opacity: 0.9;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+.main-container {
+grid-template-columns: 1fr;
+}
+
+.left-panel,
+.center-panel,
+.right-panel {
+margin-bottom: 15px;
+}
+
+}
