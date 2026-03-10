@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const serverless = require("serverless-http");
 
 const db = require("../server/db.js");
 
@@ -121,7 +122,7 @@ app.post("/attendance", async (req, res) => {
 });
 
 /* -------------------------
-GET SUMMARY
+SUMMARY
 --------------------------*/
 
 app.get("/summary/:student", async (req, res) => {
@@ -164,7 +165,7 @@ app.get("/summary/:student", async (req, res) => {
 });
 
 /* -------------------------
-OVERALL ATTENDANCE
+OVERALL
 --------------------------*/
 
 app.get("/overall/:student", async (req, res) => {
@@ -201,7 +202,7 @@ app.get("/overall/:student", async (req, res) => {
 });
 
 /* -------------------------
-STATIC PAGE
+STATIC
 --------------------------*/
 
 app.get("/", (req, res) => {
@@ -212,9 +213,8 @@ app.get("/health", (req, res) => {
   res.send("OK");
 });
 
-const PORT = process.env.PORT || 3000;
+/* -------------------------
+EXPORT FOR VERCEL
+--------------------------*/
 
-// app.listen(PORT, () => {
-//   console.log("Server running on port", PORT);
-// });
-module.exports = app;
+module.exports = serverless(app);

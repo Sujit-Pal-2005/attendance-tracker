@@ -1,10 +1,7 @@
 {
+  "version": 2,
   "routes": [
-    { "src": "/students", "dest": "/api/index.js" },
-    { "src": "/attendance/(.*)", "dest": "/api/index.js" },
-    { "src": "/routine/(.*)", "dest": "/api/index.js" },
-    { "src": "/summary/(.*)", "dest": "/api/index.js" },
-    { "src": "/overall/(.*)", "dest": "/api/index.js" },
+    { "src": "/(students|attendance|routine|summary|overall)(.*)", "dest": "/api/index.js" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
