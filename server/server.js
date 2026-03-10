@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const db = require("./db");
 
@@ -7,199 +8,201 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-const path = require("path");
 app.use(express.static(path.join(__dirname, "../public")));
 
 /* -------------------------
 GET ALL STUDENTS
 --------------------------*/
 
-app.get("/students", (req, res) => {
-  db.all("SELECT * FROM students", (err, rows) => {
-    if (err) return res.status(500).json(err);
-
-    res.json(rows);
-  });
+app.get("/students", async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM students");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 /* -------------------------
 ADD STUDENT
 --------------------------*/
 
-app.post("/students", (req, res) => {
+app.post("/students", async (req, res) => {
   const { name } = req.body;
 
-  db.run("INSERT INTO students(name) VALUES(?)", [name], function (err) {
-    if (err) return res.status(500).json(err);
+  try {
+    const result = await db.query(
+      "INSERT INTO students(name) VALUES($1) RETURNING id",
+      [name],
+    );
 
-    res.json({ id: this.lastID, name });
-  });
+    res.json({
+      id: result.rows[0].id,
+      name,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 /* -------------------------
 GET ROUTINE BY DATE
 --------------------------*/
 
-app.get("/routine/:date", (req, res) => {
+app.get("/routine/:date", async (req, res) => {
   const date = req.params.date;
 
   const weekday = new Date(date).toLocaleDateString("en-US", {
     weekday: "long",
   });
 
-  db.all(
-    `SELECT subjects.id, subjects.name, subjects.weight
-FROM routine
-JOIN subjects
-ON routine.subject_id = subjects.id
-WHERE routine.weekday = ?`,
+  try {
+    const result = await db.query(
+      `SELECT subjects.id, subjects.name, subjects.weight
+       FROM routine
+       JOIN subjects
+       ON routine.subject_id = subjects.id
+       WHERE routine.weekday = $1`,
+      [weekday],
+    );
 
-    [weekday],
-
-    (err, rows) => {
-      if (err) return res.status(500).json(err);
-
-      res.json(rows);
-    },
-  );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 /* -------------------------
 GET ATTENDANCE OF STUDENT
 --------------------------*/
 
-app.get("/attendance/:student/:date", (req, res) => {
+app.get("/attendance/:student/:date", async (req, res) => {
   const { student, date } = req.params;
 
-  db.all(
-    `SELECT subject_id,status
-FROM attendance
-WHERE student_id=? AND date=?`,
+  try {
+    const result = await db.query(
+      `SELECT subject_id,status
+       FROM attendance
+       WHERE student_id=$1 AND date=$2`,
+      [student, date],
+    );
 
-    [student, date],
-
-    (err, rows) => {
-      if (err) return res.status(500).json(err);
-
-      res.json(rows);
-    },
-  );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 /* -------------------------
 MARK / UPDATE ATTENDANCE
 --------------------------*/
 
-app.post("/attendance", (req, res) => {
+app.post("/attendance", async (req, res) => {
   const { student_id, subject_id, date, status } = req.body;
 
-  // console.log("Incoming attendance request:");
-  // console.log({ student_id, subject_id, date, status });
+  try {
+    const result = await db.query(
+      `INSERT INTO attendance
+       (student_id,subject_id,date,status)
+       VALUES($1,$2,$3,$4)
+       ON CONFLICT(student_id,subject_id,date)
+       DO UPDATE SET status=EXCLUDED.status`,
+      [student_id, subject_id, date, status],
+    );
 
-  db.run(
-    `INSERT INTO attendance
-    (student_id,subject_id,date,status)
-    VALUES(?,?,?,?)
-    ON CONFLICT(student_id,subject_id,date)
-    DO UPDATE SET status=excluded.status`,
-
-    [student_id, subject_id, date, status],
-
-    function (err) {
-      if (err) {
-        console.error("SQLite Error while saving attendance:");
-        console.error(err.message);
-        console.error(err);
-
-        return res.status(500).json({
-          error: err.message,
-        });
-      }
-
-      // console.log("Attendance saved successfully");
-
-      res.json({
-        message: "attendance saved",
-        changes: this.changes,
-      });
-    },
-  );
+    res.json({
+      message: "attendance saved",
+      changes: result.rowCount,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
 });
 
-// Get summary
-app.get("/summary/:student", (req, res) => {
+/* -------------------------
+GET SUMMARY
+--------------------------*/
+
+app.get("/summary/:student", async (req, res) => {
   const student = req.params.student;
 
-  db.all(
-    `SELECT 
-      subjects.name AS subject,
-      SUM(subjects.weight) AS total,
-      SUM(
-        CASE 
-          WHEN attendance.status='attended' 
-          THEN subjects.weight 
-          ELSE 0 
-        END
-      ) AS attended
-     FROM attendance
-     JOIN subjects
-     ON attendance.subject_id = subjects.id
-     WHERE attendance.student_id = ?
-     AND attendance.status != 'cancelled'
-     GROUP BY subjects.id`,
+  try {
+    const result = await db.query(
+      `SELECT 
+        subjects.name AS subject,
+        SUM(subjects.weight) AS total,
+        SUM(
+          CASE 
+            WHEN attendance.status='attended' 
+            THEN subjects.weight 
+            ELSE 0 
+          END
+        ) AS attended
+       FROM attendance
+       JOIN subjects
+       ON attendance.subject_id = subjects.id
+       WHERE attendance.student_id = $1
+       AND attendance.status != 'cancelled'
+       GROUP BY subjects.id`,
+      [student],
+    );
 
-    [student],
+    const rows = result.rows;
 
-    (err, rows) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json(err);
-      }
+    const data = rows.map((r) => ({
+      subject: r.subject,
+      total: Number(r.total) || 0,
+      attended: Number(r.attended) || 0,
+      percent: r.total ? Math.round((r.attended / r.total) * 100) : 0,
+    }));
 
-      const result = rows.map((r) => ({
-        subject: r.subject,
-        total: r.total || 0,
-        attended: r.attended || 0,
-        percent: r.total ? Math.round((r.attended / r.total) * 100) : 0,
-      }));
-      // console.log(result);
-      res.json(result);
-    },
-  );
+    res.json(data);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-app.get("/overall/:student", (req, res) => {
+/* -------------------------
+OVERALL ATTENDANCE
+--------------------------*/
+
+app.get("/overall/:student", async (req, res) => {
   const student = req.params.student;
 
-  db.get(
-    `SELECT
-     SUM(CASE WHEN attendance.status='attended' THEN subjects.weight ELSE 0 END) AS attended,
-     SUM(subjects.weight) AS total
-     FROM attendance
-     JOIN subjects
-     ON attendance.subject_id = subjects.id
-     WHERE attendance.student_id=? 
-     AND attendance.status!='cancelled'`,
+  try {
+    const result = await db.query(
+      `SELECT
+       SUM(CASE WHEN attendance.status='attended' THEN subjects.weight ELSE 0 END) AS attended,
+       SUM(subjects.weight) AS total
+       FROM attendance
+       JOIN subjects
+       ON attendance.subject_id = subjects.id
+       WHERE attendance.student_id=$1 
+       AND attendance.status!='cancelled'`,
+      [student],
+    );
 
-    [student],
+    const row = result.rows[0];
 
-    (err, row) => {
-      if (err) return res.status(500).json(err);
+    const attended = Number(row?.attended) || 0;
+    const total = Number(row?.total) || 0;
 
-      const attended = row?.attended || 0;
-      const total = row?.total || 0;
+    const percent = total ? Math.round((attended / total) * 100) : 0;
 
-      const percent = total ? Math.round((attended / total) * 100) : 0;
-      // console.log(row);
-
-      res.json({
-        attended,
-        total,
-        percent,
-      });
-    },
-  );
+    res.json({
+      attended,
+      total,
+      percent,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
+
+/* -------------------------
+STATIC PAGE
+--------------------------*/
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));

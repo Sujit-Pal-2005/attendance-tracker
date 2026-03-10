@@ -1,117 +1,134 @@
-const path = require("path");
-const sqlite3 = require("sqlite3").verbose();
+const { Pool } = require("pg");
+require("dotenv").config();
 
-const dbPath = path.join(__dirname, "../database/attendance.db");
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
-const db = new sqlite3.Database(dbPath, (err) => {
+pool.connect((err) => {
   if (err) {
     console.error("Database connection error:", err.message);
   } else {
-    console.log("Connected to SQLite database:", dbPath);
+    console.log("Connected to Neon PostgreSQL");
   }
 });
 
-/* create tables */
+/* CREATE TABLES */
 
-db.serialize(() => {
-  /* STUDENTS */
+async function initDB() {
+  try {
+    /* STUDENTS */
 
-  db.run(`
-  CREATE TABLE IF NOT EXISTS students(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL
-  )
-  `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS students(
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL
+      )
+    `);
 
-  /* SUBJECTS */
+    /* SUBJECTS */
 
-  db.run(`
-  CREATE TABLE IF NOT EXISTS subjects(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    weight INTEGER DEFAULT 1
-  )
-  `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS subjects(
+        id SERIAL PRIMARY KEY,
+        name TEXT UNIQUE NOT NULL,
+        weight INTEGER DEFAULT 1
+      )
+    `);
 
-  /* ROUTINE */
+    /* ROUTINE */
 
-  db.run(`
-  CREATE TABLE IF NOT EXISTS routine(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    weekday TEXT NOT NULL,
-    subject_id INTEGER,
-    UNIQUE(weekday, subject_id),
-    FOREIGN KEY(subject_id) REFERENCES subjects(id)
-  )
-  `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS routine(
+        id SERIAL PRIMARY KEY,
+        weekday TEXT NOT NULL,
+        subject_id INTEGER,
+        UNIQUE(weekday, subject_id),
+        FOREIGN KEY(subject_id) REFERENCES subjects(id)
+      )
+    `);
 
-  /* ATTENDANCE */
+    /* ATTENDANCE */
 
-  db.run(`
-  CREATE TABLE IF NOT EXISTS attendance(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    student_id INTEGER,
-    subject_id INTEGER,
-    date TEXT,
-    status TEXT,
-    UNIQUE(student_id, subject_id, date),
-    FOREIGN KEY(student_id) REFERENCES students(id),
-    FOREIGN KEY(subject_id) REFERENCES subjects(id)
-  )
-  `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS attendance(
+        id SERIAL PRIMARY KEY,
+        student_id INTEGER,
+        subject_id INTEGER,
+        date TEXT,
+        status TEXT,
+        UNIQUE(student_id, subject_id, date),
+        FOREIGN KEY(student_id) REFERENCES students(id),
+        FOREIGN KEY(subject_id) REFERENCES subjects(id)
+      )
+    `);
 
-  /* ------------------------
-     SEED SUBJECTS
-  ------------------------*/
+    // console.log("Tables created successfully");
 
-  const subjects = [
-    { name: "DS", weight: 2 },
-    { name: "IT", weight: 2 },
-    { name: "CG", weight: 4 },
-    { name: "FLAT", weight: 2 },
-    { name: "IED", weight: 2 },
-    { name: "CG Lab", weight: 3 },
-    { name: "IT Lab", weight: 3 },
-    { name: "Mini Project", weight: 3 },
-  ];
+    /* ------------------------
+       SEED SUBJECTS
+    ------------------------*/
 
-  subjects.forEach((s) => {
-    db.run(`INSERT OR IGNORE INTO subjects(name,weight) VALUES(?,?)`, [
-      s.name,
-      s.weight,
-    ]);
-  });
+    const subjects = [
+      { name: "DS", weight: 2 },
+      { name: "IT", weight: 2 },
+      { name: "CG", weight: 4 },
+      { name: "FLAT", weight: 2 },
+      { name: "IED", weight: 2 },
+      { name: "CG Lab", weight: 3 },
+      { name: "IT Lab", weight: 3 },
+      { name: "Mini Project", weight: 3 },
+    ];
 
-  /* ------------------------
-     SEED ROUTINE
-  ------------------------*/
-
-  const routine = {
-    Monday: ["DS", "IT", "CG"],
-    Tuesday: ["IED", "FLAT", "Mini Project"],
-    Wednesday: ["DS", "CG Lab"],
-    Thursday: ["IED", "IT Lab"],
-    Friday: ["IT", "FLAT", "Mini Project"],
-  };
-
-  Object.keys(routine).forEach((day) => {
-    routine[day].forEach((subject) => {
-      db.get(
-        `SELECT id FROM subjects WHERE name=?`,
-        [subject],
-
-        (err, row) => {
-          if (!row) return;
-
-          db.run(
-            `INSERT OR IGNORE INTO routine(weekday,subject_id)
-             VALUES(?,?)`,
-            [day, row.id],
-          );
-        },
+    for (const s of subjects) {
+      await pool.query(
+        `INSERT INTO subjects(name,weight)
+         VALUES($1,$2)
+         ON CONFLICT(name) DO NOTHING`,
+        [s.name, s.weight],
       );
-    });
-  });
-});
+    }
 
-module.exports = db;
+    /* ------------------------
+       SEED ROUTINE
+    ------------------------*/
+
+    const routine = {
+      Monday: ["DS", "IT", "CG"],
+      Tuesday: ["IED", "FLAT", "Mini Project"],
+      Wednesday: ["DS", "CG Lab"],
+      Thursday: ["IED", "IT Lab"],
+      Friday: ["IT", "FLAT", "Mini Project"],
+    };
+
+    for (const day of Object.keys(routine)) {
+      for (const subject of routine[day]) {
+        const res = await pool.query(`SELECT id FROM subjects WHERE name=$1`, [
+          subject,
+        ]);
+
+        if (res.rows.length === 0) continue;
+
+        const subjectId = res.rows[0].id;
+
+        await pool.query(
+          `INSERT INTO routine(weekday,subject_id)
+           VALUES($1,$2)
+           ON CONFLICT DO NOTHING`,
+          [day, subjectId],
+        );
+      }
+    }
+
+    // console.log("Seed data inserted");
+  } catch (err) {
+    console.error("DB Init Error:", err);
+  }
+}
+
+initDB();
+
+module.exports = pool;
