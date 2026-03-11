@@ -1,8 +1,8 @@
 {
   "name": "attendance-system",
   "version": "1.0.0",
-  "description": "Full-stack attendance tracking system using Node.js, Express and SQLite",
-  "main": "server/server.js",
+  "description": "Full-stack attendance tracking system using Node.js, Express and Postgrace",
+  "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
     "test": "echo \"No tests specified\""
