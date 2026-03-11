@@ -216,5 +216,7 @@ app.get("/health", (req, res) => {
 /* -------------------------
 EXPORT FOR VERCEL
 --------------------------*/
-
+app.listen(3000, () => {
+  console.log("App is listening on port :3000");
+});
 module.exports = serverless(app);
