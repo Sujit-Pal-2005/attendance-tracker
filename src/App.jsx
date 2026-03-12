@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { seedAttendance } from "./seedFirestore";
 
 import {
   getStudents,
@@ -129,7 +128,6 @@ export default function App() {
     setDate(today);
 
     loadStudents();
-    // seedAttendance();
   }, []);
 
   useEffect(() => {
