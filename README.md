@@ -1,146 +1,16 @@
-# 📘 Attendance Tracker
+# React + Vite
 
-A simple **full-stack attendance tracking system** built using
-**Node.js, Express, SQLite, and Vanilla JavaScript**. It allows users to
-manage students, track daily attendance, and analyze attendance
-statistics based on **subject weights**.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
----
+Currently, two official plugins are available:
 
-## 🚀 Features
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- Add and manage students
-- Automatic daily routine based on weekday
-- Mark attendance (Attended / Missed / Cancelled)
-- Attendance calculated **based on subject weight**
-- Overall attendance percentage visualization
-- Subject-wise attendance summary
-- Working day navigation (previous / next class day)
-- Automatic selection of today's date and first student
-- REST API backend with SQLite database
+## React Compiler
 
----
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 🖥️ Tech Stack
+## Expanding the ESLint configuration
 
-### Backend
-
-- Node.js
-- Express.js
-- SQLite
-
-### Frontend
-
-- HTML
-- CSS
-- Vanilla JavaScript
-
----
-
-<!-- ## 📂 Project Structure
-
-    attendance-tracker
-    │
-    ├ server.js              # Express server
-    ├ db.js                  # SQLite database setup
-    ├ package.json
-    │
-    ├ database
-    │   └ attendance.db      # SQLite database
-    │
-    └ public
-        ├ index.html         # Frontend UI
-        ├ app.js             # Client-side logic
-        └ style.css          # Styling
-
---- -->
-
-## ⚙️ Installation
-
-Clone the repository:
-
-    git clone https://github.com/Sujit-Pal-2005/attendance-tracker.git
-    cd attendance-tracker
-
-Install dependencies:
-
-    npm install
-
-Run the server:
-
-    node server.js
-
----
-
-## 🌐 Open in Browser
-
-    http://localhost:3000
-
----
-
-<!-- ## 📊 How Attendance is Calculated
-
-Each subject has a **weight value**.
-
-Example:
-
-Subject Weight
-
----
-
-DS 2
-CG 4
-IT 2
-
-Attendance percentage is calculated using **weighted values**:
-
-    Attendance % = (Attended Weight / Total Weight) × 100
-
-Cancelled classes are **excluded** from the total.
-
----
-
-## 🔗 API Endpoints
-
-### Students
-
-    GET /students
-    POST /students
-
-### Routine
-
-    GET /routine/:date
-
-### Attendance
-
-    POST /attendance
-    GET /attendance/:student/:date
-
-### Analytics
-
-    GET /summary/:student
-    GET /overall/:student
-
-<!-- ------------------------------------------------------------------------
-
-## 🔮 Future Improvements
-
--   Authentication system
--   Attendance analytics graphs
--   75% attendance warning system
--   Mobile responsive UI
--   Export attendance reports -->
-
---- -->
-
-## 👨‍💻 Author
-
-**Sujit Pal**\
-Computer Science & Engineering Student
-
-GitHub:\
-https://github.com/Sujit-Pal-2005
-
----
-
-⭐ If you like this project, consider giving it a star on GitHub!
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
