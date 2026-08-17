@@ -123,8 +123,7 @@ export default function App() {
   ------------------------------*/
 
   useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-
+    const today = new Date().toLocaleDateString('en-CA'); 
     setDate(today);
 
     loadStudents();
@@ -142,7 +141,7 @@ export default function App() {
 
   function isWorkingDay(date) {
     const day = new Date(date).getDay();
-    return day !== 0 && day !== 6; // skip Sunday & Saturday
+    return day !== 0 && day !== 6 && day!==5;
   }
 
   function nextDay() {
